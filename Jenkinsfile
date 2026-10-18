@@ -19,7 +19,14 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline execution completed.'
+            // Automatically parses JUnit XML test reports and publishes them to the Jenkins dashboard
+            junit 'target/surefire-reports/*.xml'
+        }
+        success {
+            echo 'Pipeline completed successfully and test reports published!'
+        }
+        failure {
+            echo 'Pipeline failed. Check test reports for details.'
         }
     }
 }
