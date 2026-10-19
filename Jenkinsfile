@@ -4,14 +4,12 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                // Pulls the latest code from your GitHub repository
                 git branch: 'main', url: 'https://github.com/Ruthik005/learn_devops.git'
             }
         }
 
         stage('Maven Clean & Test') {
             steps {
-                // Executes the Maven build and runs JUnit tests on Windows
                 bat 'mvn clean test'
             }
         }
@@ -19,14 +17,24 @@ pipeline {
 
     post {
         always {
-            // Automatically parses JUnit XML test reports and publishes them to the Jenkins dashboard
+            // Parses JUnit XML test reports for the dashboard
             junit 'target/surefire-reports/*.xml'
         }
         success {
-            echo 'Pipeline completed successfully and test reports published!'
+            // Sends an email notification on build success
+            emailext (
+                subject: "SUCCESS: Job '${env.JOB_NAME} [Build #${env.BUILD_NUMBER}]'",
+                body: "Good news! The pipeline completed successfully.\n\nCheck console output at: ${env.BUILD_URL}",
+                to: 'ruthikpyla2005@gmail.com' // Replace with your actual email address
+            )
         }
         failure {
-            echo 'Pipeline failed. Check test reports for details.'
+            // Sends an email notification on build failure
+            emailext (
+                subject: "FAILED: Job '${env.JOB_NAME} [Build #${env.BUILD_NUMBER}]'",
+                body: "Alert! The pipeline has failed.\n\nPlease check console output at: ${env.BUILD_URL}",
+                to: 'ruthikpyla2005@gmail.com' // Replace with your actual email address
+            )
         }
     }
 }
